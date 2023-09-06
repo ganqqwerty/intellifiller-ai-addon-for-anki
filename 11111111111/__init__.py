@@ -3,6 +3,8 @@
 import os
 
 from PyQt5.QtWidgets import QAction, QDialog, QVBoxLayout, QPushButton, QTextEdit, QLineEdit
+from PyQt5.QtWidgets import QLabel, QComboBox
+
 from aqt import mw
 from anki.hooks import addHook
 import json
@@ -229,25 +231,35 @@ def show_dialog(browser):
 
     layout = QVBoxLayout()
 
-    field_name_input = QLineEdit()
-    field_name_input.setText(default_field_name)
+    # Create a QLabel for the QComboBox
+    field_name_label = QLabel("Select Field:")
+    layout.addWidget(field_name_label)
+
+    # Replace QLineEdit with QComboBox and populate it
+    field_name_combobox = QComboBox()
+    selected_nodes_ids = [mw.col.getCard(card_id).nid for card_id in cards]
+    field_names = get_common_fields(selected_nodes_ids)
+    field_name_combobox.addItems(sorted(field_names))
+    if default_field_name in field_names:
+        field_name_combobox.setCurrentText(default_field_name)
 
     count_button = QPushButton("Count")
     result_display = QTextEdit()
 
     def on_count():
-        field_name = field_name_input.text()
+        field_name = field_name_combobox.currentText()
         stats = count_characters(cards, field_name)
         result_display.setHtml(stats)
 
     count_button.clicked.connect(on_count)
 
-    layout.addWidget(field_name_input)
+    layout.addWidget(field_name_combobox)
     layout.addWidget(count_button)
     layout.addWidget(result_display)
 
     dialog.setLayout(layout)
     dialog.exec_()
+
 
 
 addHook("browser.onContextMenu", add_context_menu_items)

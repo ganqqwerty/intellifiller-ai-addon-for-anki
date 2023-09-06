@@ -2,7 +2,7 @@
 
 import os
 
-from PyQt5.QtWidgets import QAction, QDialog, QVBoxLayout, QPushButton, QTextEdit
+from PyQt5.QtWidgets import QAction, QDialog, QVBoxLayout, QPushButton, QTextEdit, QLineEdit
 from aqt import mw
 from anki.hooks import addHook
 import json
@@ -13,6 +13,14 @@ db_file = os.path.join(addon_dir, "kanji.json")
 with open(db_file, "r", encoding="utf-8") as file:
     KANJI_DATA = json.load(file)
 
+
+def get_common_fields(selected_nodes_ids):
+    common_fields = set(mw.col.getNote(selected_nodes_ids[0]).keys())
+    for nid in selected_nodes_ids:
+        note = mw.col.getNote(nid)
+        note_fields = set(note.keys())
+        common_fields = common_fields.intersection(note_fields)
+    return list(common_fields)
 
 def classify_kanji_by_jlpt(kanji_dict):
     jlpt_lists = {5: [], 4: [], 3: [], 2: [], 1: [], 'not_in_jlpt': []}
@@ -128,6 +136,7 @@ def format_kanji_statistics(kanji_dict, jlpt_lists, total_cards, no_field_count,
 """
 
     stats = f"""{CSS_STYLE}
+    <h3>Stats</h3>
     <ul>
         <li>Total cards: {total_cards}</li>
         <li>Cards that don't have the "{field_name}" field: {no_field_count}</li>
@@ -220,13 +229,14 @@ def show_dialog(browser):
 
     layout = QVBoxLayout()
 
-    field_name_input = QTextEdit()
-    field_name_input.setPlainText(default_field_name)
+    field_name_input = QLineEdit()
+    field_name_input.setText(default_field_name)
+
     count_button = QPushButton("Count")
     result_display = QTextEdit()
 
     def on_count():
-        field_name = field_name_input.toPlainText()
+        field_name = field_name_input.text()
         stats = count_characters(cards, field_name)
         result_display.setHtml(stats)
 

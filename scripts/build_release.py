@@ -30,8 +30,11 @@ def build_all_platforms():
             '--platform', platform_tag,
             '--target', platform_dir,
             '--only-binary=:all:',
+            '--no-deps',
             'openai>=1.0.0',
-            'httpx>=0.24.0'
+            'httpx>=0.24.0',
+            'pydantic_core',
+            'pydantic'
         ])
 
 if __name__ == '__main__':

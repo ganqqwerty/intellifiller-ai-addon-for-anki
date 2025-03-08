@@ -4,7 +4,7 @@ Anki AI is an addon that enriches your anki cards with the information from the 
 
 ## Keys Explanation
 
-- `apiKey`: Your OpenAI GPT API key. Get it from the OpenAI website.
+- `apiKey`: Your personal OpenAI GPT API key. Get it from the OpenAI websitek. The one in config.json won't work.
 
 - `emulate`: Set to "yes" to use fake responses for testing, "no" for real API requests.
 

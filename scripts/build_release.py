@@ -26,15 +26,13 @@ def build_all_platforms():
         
         print(f"Building for {platform_tag}...")
         subprocess.check_call([
-            'pip', 'install',
+            'pip3.9', 'install',
             '--platform', platform_tag,
             '--target', platform_dir,
             '--only-binary=:all:',
             '--no-deps',
             'openai>=1.0.0',
-            'httpx>=0.24.0',
-            'pydantic_core',
-            'pydantic'
+            'httpx>=0.24.0'
         ])
 
 if __name__ == '__main__':

@@ -6,12 +6,30 @@ from aqt.browser import Browser
 from aqt.addcards import AddCards
 from anki.hooks import addHook
 import os
+import sys
+
 
 from .settings_editor import SettingsWindow
 from .process_notes import process_notes, generate_for_single_note
 from .run_prompt_dialog import RunPromptDialog
 
 ADDON_NAME = 'IntelliFiller'
+
+# Ensure our addon’s vendor folder is the first thing in sys.path
+vendor_path = os.path.join(os.path.dirname(__file__), 'vendor', 'darwin_arm64')
+sys.path.insert(0, vendor_path)
+
+# Debugging information
+print("🔍 Anki Addon Loading Dependencies From:", vendor_path)
+print("🔍 sys.path:", sys.path)
+
+# Check if the correct typing_extensions is loaded
+try:
+    import typing_extensions
+    print("✅ Loaded typing_extensions from:", typing_extensions.__file__)
+except ImportError as e:
+    print("❌ Failed to load typing_extensions:", e)
+
 
 def get_common_fields(selected_nodes_ids):
     common_fields = set(mw.col.getNote(selected_nodes_ids[0]).keys())

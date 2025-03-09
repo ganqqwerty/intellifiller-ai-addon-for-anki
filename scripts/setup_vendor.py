@@ -12,7 +12,7 @@ def setup_vendor():
     os.makedirs(vendor_dir)
 
     # Determine platform-specific pip arguments
-    pip_args = ['pip', 'install', '--target', vendor_dir]
+    pip_args = ['pip3.9', 'install', '--target', vendor_dir]
     
     system = platform.system().lower()
     machine = platform.machine().lower()
@@ -35,7 +35,8 @@ def setup_vendor():
     # Add the packages
     pip_args.extend([
         'openai>=1.0.0',
-        'httpx>=0.24.0'
+        'httpx>=0.24.0',
+        'typing_extensions>=4.7.0'
     ])
 
     try:
@@ -44,7 +45,7 @@ def setup_vendor():
         print(f"Error installing packages: {e}")
         print("Attempting fallback installation without platform specification...")
         # Fallback to simple install without platform specification
-        fallback_args = ['pip', 'install', '--target', vendor_dir, 'openai>=1.0.0', 'httpx>=0.24.0']
+        fallback_args = ['pip3.9', 'install', '--target', vendor_dir, 'openai>=1.0.0', 'httpx>=0.24.0']
         subprocess.check_call(fallback_args)
 
     # Remove unnecessary files to keep vendor directory slim

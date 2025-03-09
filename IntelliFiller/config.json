@@ -1,4 +1,5 @@
 {
+  "selectedApi": "openai",
   "apiKey": "sk-H16sB4vjHI78qkrTBW301BlbkFarYSeOH6w1mH5DoLgzRRl",
   "emulate": "no",
   "prompts": [

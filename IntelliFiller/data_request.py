@@ -4,6 +4,7 @@ import os
 from aqt.utils import showWarning
 from aqt import mw
 
+
 import platform
 def get_platform_specific_vendor():
     system = platform.system().lower()
@@ -26,9 +27,6 @@ sys.path.append(vendor_dir)
 
 import openai
 from .anthropic_client import SimpleAnthropicClient
-import time;
-
-
 from html import unescape
 
 
@@ -55,13 +53,18 @@ def send_prompt_to_llm(prompt):
 
     try:
         print("Request to API: ", prompt)
-        
         def try_openai_call():
-            openai.api_key = config['apiKey']
-            response = openai.ChatCompletion.create(
-                model="gpt-4o-mini", 
-                messages=[{"role": "user", "content": prompt}], 
-                max_tokens=2000
+            client = openai.OpenAI(
+                api_key=config['apiKey'],  # This is the default and can be omitted
+            )
+            response = client.chat.completions.create(
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt,
+                    }
+                ],
+                model="gpt-4o-mini",
             )
             print("Response from OpenAI:", response)
             return response.choices[0].message.content.strip()
@@ -71,24 +74,20 @@ def send_prompt_to_llm(prompt):
             response = client.create_message(prompt)
             print("Response from Anthropic:", response)
             return response
-
-        maximum = 300
-        while maximum > 0:
-            maximum -= 1
-            try:
-                if config['selectedApi'] == 'anthropic':
-                    return try_anthropic_call()
-                else:  # openai
-                    return try_openai_call()
-            except openai.APIConnectionError as e:
-                showWarning(f"The server could not be reached {str(e.__cause__)}")  # an underlying Exception, likely raised within httpx.
-            except openai.RateLimitError as e:
-                showWarning("A 429 status code was received; we should back off a bit.")
-            except openai.APIStatusError as e:
-                showWarning(f"Another non-200-range status code was received:  {str(e.status_code)}, {str(e.response)}")
-            except Exception as e:
-                # For other exceptions, we don't want to retry
-                raise e
+        try:
+            if config['selectedApi'] == 'anthropic':
+                return try_anthropic_call()
+            else:  # openai
+                return try_openai_call()
+        except openai.APIConnectionError as e:
+            showWarning(f"The server could not be reached {str(e.__cause__)}")  # an underlying Exception, likely raised within httpx.
+        except openai.RateLimitError as e:
+            showWarning("A 429 status code was received; we should back off a bit.")
+        except openai.APIStatusError as e:
+            showWarning(f"Another non-200-range status code was received:  {str(e.status_code)}, {str(e.response)}")
+        except Exception as e:
+            # For other exceptions, we don't want to retry
+            raise e
     except Exception as e:
         print(f"An error occurred while processing the note: {str(e)}", file=sys.stderr)
         showWarning(f"An error occurred while processing the note: {str(e)}")

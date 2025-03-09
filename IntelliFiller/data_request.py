@@ -80,12 +80,15 @@ def send_prompt_to_llm(prompt):
                     return try_anthropic_call()
                 else:  # openai
                     return try_openai_call()
-            except openai.error.RateLimitError as e:
-                time.sleep(1.0)  # Wait before retrying
+            except openai.APIConnectionError as e:
+                showWarning(f"The server could not be reached {str(e.__cause__)}")  # an underlying Exception, likely raised within httpx.
+            except openai.RateLimitError as e:
+                showWarning("A 429 status code was received; we should back off a bit.")
+            except openai.APIStatusError as e:
+                showWarning(f"Another non-200-range status code was received:  {str(e.status_code)}, {str(e.response)}")
             except Exception as e:
                 # For other exceptions, we don't want to retry
                 raise e
-
     except Exception as e:
         print(f"An error occurred while processing the note: {str(e)}", file=sys.stderr)
         showWarning(f"An error occurred while processing the note: {str(e)}")

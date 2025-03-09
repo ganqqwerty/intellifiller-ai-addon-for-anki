@@ -30,6 +30,13 @@ try:
 except ImportError as e:
     print("❌ Failed to load typing_extensions:", e)
 
+def handle_edit_current_mode(editor: Editor, prompt_config):
+    editCurrentWindow: EditCurrent = editor.parentWindow
+    common_fields = get_common_fields([editor.note.id])
+    dialog = RunPromptDialog(editCurrentWindow, common_fields, prompt_config)
+    if dialog.exec() == QDialog.DialogCode.Accepted:
+        updated_prompt_config = dialog.get_result()
+        generate_for_single_note(editor, updated_prompt_config)
 
 def get_common_fields(selected_nodes_ids):
     common_fields = set(mw.col.getNote(selected_nodes_ids[0]).keys())
@@ -66,7 +73,7 @@ def create_run_prompt_dialog_from_editor(editor: Editor, prompt_config):
     if editor.editorMode == EditorMode.BROWSER:
         handle_browser_mode(editor, prompt_config)
     elif editor.editorMode == EditorMode.EDIT_CURRENT or editor.editorMode == EditorMode.ADD_CARDS:
-            handle_no_browser_mode(editor, prompt_config)
+        handle_edit_current_mode(editor, prompt_config)
 
 def add_context_menu_items(browser, menu):
     submenu = QMenu(ADDON_NAME, menu)

@@ -37,6 +37,7 @@ def setup_vendor():
         'openai>=1.0.0',
         'httpx>=0.24.0',
         'typing_extensions>=4.7.0'
+        'pydantic'
     ])
 
     try:
